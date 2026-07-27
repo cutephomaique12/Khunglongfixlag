@@ -85,6 +85,62 @@
         </div>
     </div>
 
+    <!-- Version v=4 để ép tải file JS mới chống lỗi Fetch -->
+    <script src="config.js?v=4"></script>
+    <script src="main.js?v=4"></script>
+</body>
+</html>
+        /* Footer Mạng xã hội */
+        .footer { margin-top: 40px; text-align: center; }
+        .social-btn { display: inline-block; padding: 10px 20px; margin: 5px; border-radius: 5px; text-decoration: none; color: #fff; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
+        .btn-yt { background: #ff0000; }
+        .btn-yt:hover { background: #cc0000; }
+        .btn-tele { background: #0088cc; }
+        .btn-tele:hover { background: #006699; }
+
+        /* Popup hiển thị link gốc sau khi vượt thành công */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
+        .modal-content { background: #1e1e1e; border: 2px solid #00ff88; padding: 30px; border-radius: 12px; max-width: 90%; width: 400px; text-align: center; box-shadow: 0 0 30px rgba(0,255,136,0.2); }
+        .modal-content h3 { color: #00ff88; margin-bottom: 15px; font-size: 1.5rem; }
+        .modal-content p { margin-bottom: 25px; color: #ccc; }
+        .btn-download { display: inline-block; background: #00ff88; color: #000; padding: 12px 25px; text-decoration: none; font-weight: bold; border-radius: 5px; font-size: 1.1rem; }
+        .btn-download:hover { background: #00cc6a; }
+        .close-modal { margin-top: 20px; display: block; color: #888; text-decoration: underline; cursor: pointer; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Khủng Long Tool</h1>
+            <p>Chia sẻ Mods & Fix Lag an toàn, mượt mà</p>
+        </div>
+
+        <div class="notice-box" id="noticeBox">
+            <!-- Tự động load từ config.js -->
+        </div>
+
+        <div class="grid" id="cardContainer">
+            <!-- Các nút sẽ tự động sinh ra -->
+        </div>
+
+        <div class="footer">
+            <a href="#" id="ytLink" target="_blank" class="social-btn btn-yt">📺 Kênh Youtube</a>
+            <a href="#" id="teleGroupLink" target="_blank" class="social-btn btn-tele">✈️ Box Telegram</a>
+            <a href="#" id="teleAdminLink" target="_blank" class="social-btn btn-tele">💬 Liên hệ Admin</a>
+        </div>
+    </div>
+
+    <!-- Popup hiện link Drive -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h3>🎉 Vượt Link Thành Công!</h3>
+            <p>Cảm ơn bạn đã ủng hộ. Bấm nút bên dưới để vào trang tải file của bạn.</p>
+            <a href="#" id="finalDownloadLink" target="_blank" class="btn-download">TẢI FILE NGAY</a>
+            <span class="close-modal" onclick="document.getElementById('successModal').style.display='none'">Đóng cửa sổ này</span>
+        </div>
+    </div>
+
     <!-- Version v=3 để ép tải file mới -->
     <script src="config.js?v=3"></script>
     <script src="main.js?v=3"></script>
