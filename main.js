@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
             container.innerHTML += cardHTML;
         }
 
-        // Gán sự kiện click trực tiếp cho các nút
+        // Bắt sự kiện bấm nút
         for (const key of Object.keys(CONFIG.ITEMS)) {
             const btn = document.getElementById(`btn-${key}`);
             if (btn) {
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // Xử lý Popup khi vượt link thành công quay lại
+        // Mở popup khi vượt link quay về
         const urlParams = new URLSearchParams(window.location.search);
         const unlockKey = urlParams.get('unlock');
         
@@ -47,70 +47,75 @@ document.addEventListener("DOMContentLoaded", () => {
                     modal.style.display = "flex";
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
-            } catch (e) { console.log("Mã unlock không hợp lệ"); }
+            } catch (e) {}
         }
     } catch (err) {
-        document.getElementById("noticeBox").innerText = "Lỗi tải giao diện. Vui lòng báo Admin.";
+        document.getElementById("noticeBox").innerText = "Lỗi cài đặt giao diện.";
     }
 });
 
-// Hàm gọi API Link4M siêu tốc - Chống treo web (Timeout 5 giây)
+// HÀM API VÒNG LẶP VÔ CỰC
 async function generateShortLink(itemKey) {
     const btn = document.getElementById(`btn-${itemKey}`);
-    btn.innerText = "ĐANG KẾT NỐI...";
+    btn.innerText = "ĐANG KẾT NỐI API...";
     btn.disabled = true;
 
     try {
         if (!CONFIG.API_LINK4M || CONFIG.API_LINK4M.trim() === "") {
-            alert("LỖI: Bạn chưa điền mã API_LINK4M!");
+            alert("LỖI: Bạn chưa điền mã API_LINK4M trong file config.js!");
             return resetBtn(btn);
         }
 
         const currentUrl = window.location.origin + window.location.pathname;
         const returnUrl = currentUrl + "?unlock=" + btoa(itemKey);
+        
+        // Link API gốc
         const apiUrl = `https://link4m.co/api-shorten/v2?api=${CONFIG.API_LINK4M}&url=${encodeURIComponent(returnUrl)}`;
 
-        // Hàm Ép giới hạn thời gian (5 giây không load được là hủy)
-        const fetchWithTimeout = (url) => {
-            return Promise.race([
-                fetch(url),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
-            ]);
-        };
+        // Danh sách 4 đường truyền để ép lấy bằng được link
+        const proxyList = [
+            `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`,
+            `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`,
+            `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(apiUrl)}`,
+            apiUrl // Đường truyền gốc
+        ];
 
-        let data = null;
+        let apiSuccess = false;
 
-        // CÁCH 1: THỬ KẾT NỐI TRỰC TIẾP TRƯỚC (Nhanh Nhất)
-        try {
-            const res = await fetchWithTimeout(apiUrl);
-            if (res.ok) data = await res.json();
-        } catch (e) {
-            console.log("Mạng chặn hoặc máy chủ chậm, đang đổi đường vòng...");
-        }
-
-        // CÁCH 2: THỬ DÙNG ĐƯỜNG VÒNG BẢO MẬT (Nếu Cách 1 thất bại)
-        if (!data) {
+        // Vòng lặp: Thử từng đường truyền, cái nào sập thì tự nhảy qua cái tiếp theo
+        for (let i = 0; i < proxyList.length; i++) {
             try {
-                const proxyUrl = `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(apiUrl)}`;
-                const res2 = await fetchWithTimeout(proxyUrl);
-                if (res2.ok) data = await res2.json();
-            } catch (e2) {
-                console.log("Đường vòng cũng bị chậm.");
+                console.log("Đang thử đường truyền số " + (i + 1));
+                const response = await fetch(proxyList[i]);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.status === "success" && data.shortenedUrl) {
+                        window.location.href = data.shortenedUrl; // Bay sang Link4M
+                        apiSuccess = true;
+                        break; // Thành công thì dừng vòng lặp
+                    } else if (data.status === "error") {
+                        // Nếu kết nối được mà Link4M báo lỗi (VD: Sai API, Chưa liên kết Telegram)
+                        alert("LỖI TỪ LINK4M: " + data.message + "\n\n(Gợi ý: Hãy kiểm tra xem bạn đã liên kết Telegram trên web Link4M chưa!)");
+                        apiSuccess = true; 
+                        resetBtn(btn);
+                        break;
+                    }
+                }
+            } catch (err) {
+                console.log("Đường truyền " + (i + 1) + " bị chặn, đang đổi...");
             }
         }
 
-        // KIỂM TRA & XỬ LÝ KẾT QUẢ (Không bao giờ để treo nút)
-        if (data && data.status === "success" && data.shortenedUrl) {
-            // Bay thẳng sang Link4M
-            window.location.href = data.shortenedUrl;
-        } else {
-            let msg = (data && data.message) ? data.message : "Máy chủ Link4M từ chối kết nối hoặc đang bảo trì.";
-            alert("LỖI: " + msg + "\n\nGiải pháp: Vui lòng thử dùng mạng 4G hoặc Wifi khác để lấy link.");
+        // Nếu cả 4 đường đều sập (do mạng chặn hoàn toàn)
+        if (!apiSuccess) {
+            alert("LỖI MẠNG: Điện thoại hoặc Wifi của bạn đang chặn kết nối API. Vui lòng tắt các phần mềm chặn quảng cáo hoặc dùng 4G.");
             resetBtn(btn);
         }
 
     } catch (error) {
-        alert("LỖI HỆ THỐNG: " + error.message);
+        alert("LỖI KHÔNG XÁC ĐỊNH: " + error.message);
         resetBtn(btn);
     }
 }
