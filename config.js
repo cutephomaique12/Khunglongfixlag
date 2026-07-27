@@ -4,8 +4,8 @@ const CONFIG = {
     YOUTUBE_LINK: "https://www.youtube.com/@Kh%E1%BB%A7ngLongTool",       
     TELEGRAM_GROUP: "https://t.me/khunglongmodgame",     
     TELEGRAM_ADMIN: "https://t.me/AdKhunglongmodgame",
-    TIKTOK_LINK: "https://www.tiktok.com/@khng.long.tool?_r=1&_t=ZS-98NrgpLyZQf", // <-- Thêm dòng này nè
-
+    TIKTOK_LINK: "https://www.tiktok.com/@khng.long.tool?_r=1&_t=ZS-98NrgpLyZQf",
+    
     // 2. LỜI NHẮN MUA VIP 
     NOTICE_TEXT: "Mua VIP Không Cần Vượt Link: 12k = 10 link (VD: link skin lẻ tính là 1 link). Tương tự mỗi mùa ib Admin nha, web không làm tự động khoản này.",
 
@@ -34,6 +34,13 @@ const CONFIG = {
         },
         "superfixlag": {
             title: "Super Fix Lag",
+            date: "27/07/2026",
+            status: "Đang cập nhật",
+            statusColor: "#ffaa00",            
+            driveLink: ""
+        }
+    }
+};
             date: "27/07/2026",
             status: "Đang cập nhật",
             statusColor: "#ffaa00",            
