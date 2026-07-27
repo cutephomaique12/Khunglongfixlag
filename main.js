@@ -81,7 +81,6 @@ async function generateShortLink(itemKey) {
         }
 
     } catch (error) {
-        // Nếu bạn chạy lại web mà lỗi báo ra bảng có chữ "LỖI BẢN MỚI" nghĩa là web đã cập nhật thành công!
         alert("LỖI BẢN MỚI: " + error.message + "\n\nHãy đảm bảo bạn không bật trình chặn quảng cáo nào trên điện thoại.");
         resetBtn(btn);
     }
@@ -90,73 +89,4 @@ async function generateShortLink(itemKey) {
 function resetBtn(btn) {
     btn.innerText = "🚀 Lấy Link Ngay";
     btn.disabled = false;
-}
-                
-                // Xóa url param để làm sạch thanh địa chỉ
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        } catch (e) {
-            console.log("Mã unlock không hợp lệ");
-        }
-    }
-});
-
-// 4. Hàm xử lý khi bấm nút "Lấy Link" (Đã nâng cấp chống lỗi CORS)
-async function generateShortLink(itemKey) {
-    const btn = document.getElementById(`btn-${itemKey}`);
-    btn.innerText = "Đang tạo link...";
-    btn.disabled = true;
-
-    try {
-        // Kiểm tra xem đã điền API chưa
-        if (!CONFIG.API_LINK4M || CONFIG.API_LINK4M.trim() === "") {
-            alert("Lỗi: Bạn chưa điền mã API_LINK4M trong file config.js!");
-            btn.innerText = "🚀 Lấy Link Ngay";
-            btn.disabled = false;
-            return;
-        }
-
-        const currentUrl = window.location.origin + window.location.pathname;
-        const returnUrl = currentUrl + "?unlock=" + btoa(itemKey);
-        
-        // Link API gốc
-        const apiUrl = `https://link4m.co/api-shorten/v2?api=${CONFIG.API_LINK4M}&url=${encodeURIComponent(returnUrl)}`;
-        
-        let response;
-        try {
-            // Thử gọi API trực tiếp trước
-            response = await fetch(apiUrl);
-        } catch (fetchError) {
-            // Nếu bị trình duyệt chặn (CORS/Adblock), dùng đường vòng Proxy
-            console.log("Bị chặn CORS, chuyển sang dùng Proxy...");
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
-            response = await fetch(proxyUrl);
-        }
-
-        if (!response.ok) {
-            throw new Error("Lỗi máy chủ Link4M (Mã lỗi: " + response.status + ")");
-        }
-
-        const result = await response.json();
-        
-        if (result.status === "success" || result.status === "error") {
-            if (result.shortenedUrl) {
-                // Chuyển hướng sang trang vượt link
-                window.location.href = result.shortenedUrl;
-            } else {
-                alert("Lỗi từ Link4M: " + (result.message || "Không lấy được link rút gọn."));
-                btn.innerText = "🚀 Lấy Link Ngay";
-                btn.disabled = false;
-            }
-        } else {
-            alert("Lỗi phản hồi API. Vui lòng kiểm tra lại API Key.");
-            btn.innerText = "🚀 Lấy Link Ngay";
-            btn.disabled = false;
-        }
-
-    } catch (error) {
-        alert("Chi tiết lỗi: " + error.message + "\n\nHãy tắt trình chặn quảng cáo nếu có và thử lại.");
-        btn.innerText = "🚀 Lấy Link Ngay";
-        btn.disabled = false;
-    }
 }
