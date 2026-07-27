@@ -41,10 +41,3 @@ const CONFIG = {
         }
     }
 };
-            date: "27/07/2026",
-            status: "Đang cập nhật",
-            statusColor: "#ffaa00",            
-            driveLink: ""
-        }
-    }
-};
