@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Cập nhật thông tin text và Mạng xã hội từ config
+    // Cập nhật text và link MXH
     document.getElementById("noticeBox").innerText = CONFIG.NOTICE_TEXT;
     document.getElementById("ytLink").href = CONFIG.YOUTUBE_LINK || "#";
     document.getElementById("teleGroupLink").href = CONFIG.TELEGRAM_GROUP || "#";
     document.getElementById("teleAdminLink").href = CONFIG.TELEGRAM_ADMIN || "#";
 
-    // 2. Tự động vẽ 4 nút từ CONFIG.ITEMS
+    // Vẽ 4 nút
     const container = document.getElementById("cardContainer");
     for (const [key, item] of Object.entries(CONFIG.ITEMS)) {
         const cardHTML = `
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         container.innerHTML += cardHTML;
     }
 
-    // 3. Kiểm tra xem người dùng có phải vừa vượt link xong quay lại không
+    // Kiểm tra url xem có phải vừa vượt link xong quay về không
     const urlParams = new URLSearchParams(window.location.search);
     const unlockKey = urlParams.get('unlock');
     
@@ -29,11 +29,68 @@ document.addEventListener("DOMContentLoaded", () => {
             const itemData = CONFIG.ITEMS[decodedKey];
             
             if (itemData && itemData.driveLink) {
-                // Hiển thị Popup và gắn link Drive gốc
                 const modal = document.getElementById("successModal");
                 const finalLink = document.getElementById("finalDownloadLink");
                 finalLink.href = itemData.driveLink;
                 modal.style.display = "flex";
+                
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        } catch (e) {
+            console.log("Mã unlock không hợp lệ");
+        }
+    }
+});
+
+// Hàm gọi API vượt link
+async function generateShortLink(itemKey) {
+    const btn = document.getElementById(`btn-${itemKey}`);
+    btn.innerText = "Đang tạo link...";
+    btn.disabled = true;
+
+    try {
+        if (!CONFIG.API_LINK4M || CONFIG.API_LINK4M.trim() === "") {
+            alert("LỖI: Bạn chưa điền mã API_LINK4M trong file config.js!");
+            return resetBtn(btn);
+        }
+
+        const currentUrl = window.location.origin + window.location.pathname;
+        const returnUrl = currentUrl + "?unlock=" + btoa(itemKey);
+        
+        // Link API gốc của Link4M
+        const apiUrl = `https://link4m.co/api-shorten/v2?api=${CONFIG.API_LINK4M}&url=${encodeURIComponent(returnUrl)}`;
+        
+        // Dùng Proxy allorigins để vượt rào CORS chặn API
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
+        
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error("Không thể kết nối với hệ thống trung gian.");
+        
+        const data = await response.json();
+        if (!data.contents) throw new Error("Hệ thống trung gian không trả về dữ liệu.");
+        
+        // Phân tích dữ liệu JSON trả về từ Proxy
+        const result = JSON.parse(data.contents);
+        
+        if (result.status === "success" && result.shortenedUrl) {
+            // Nhảy sang trang rút gọn thành công
+            window.location.href = result.shortenedUrl;
+        } else {
+            alert("Lỗi từ máy chủ Link4M: " + (result.message || "Sai API Key hoặc lỗi hệ thống"));
+            resetBtn(btn);
+        }
+
+    } catch (error) {
+        // Nếu bạn chạy lại web mà lỗi báo ra bảng có chữ "LỖI BẢN MỚI" nghĩa là web đã cập nhật thành công!
+        alert("LỖI BẢN MỚI: " + error.message + "\n\nHãy đảm bảo bạn không bật trình chặn quảng cáo nào trên điện thoại.");
+        resetBtn(btn);
+    }
+}
+
+function resetBtn(btn) {
+    btn.innerText = "🚀 Lấy Link Ngay";
+    btn.disabled = false;
+}
                 
                 // Xóa url param để làm sạch thanh địa chỉ
                 window.history.replaceState({}, document.title, window.location.pathname);
