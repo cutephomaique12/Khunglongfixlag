@@ -45,6 +45,7 @@ const CONFIG = {
             status: "Hoạt Động",  
             statusColor: "#00ff88",
             drivelink: ""
+        }   
 
             
     
