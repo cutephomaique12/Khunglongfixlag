@@ -14,22 +14,22 @@ const CONFIG = {
         "fixlag": {
             title: "Fix Lag V2",               
             date: "27/07/2026",                
-            status: "Hoạt động",               
-            statusColor: "#00ff88",            
+            status: "Đợi Update",               
+            statusColor: "#ffaa00",            
             driveLink: "https://docs.google.com/document/d/16Hs7-75QQOqTvvf8MCOmm0sKG8DeBlqx7s8T5dnnEDc/edit?usp=drivesdk"                      
         },
         "skinle": {
             title: "Skin Lẻ",
             date: "27/07/2026",
-            status: "Hoạt động",
-            statusColor: "#00ff88",
+            status: "Đợi Update",
+            statusColor: "#ffaa00",
             driveLink: "https://drive.google.com/drive/folders/1C4QMh9qo0SJNmbtxy5xUvFEn4KgfHpwF"
         },
         "maphd": {
             title: "Map HD",
             date: "27/07/2026",
-            status: "Hoạt động",
-            statusColor: "#00ff88",
+            status: "đợi update",
+            statusColor: "#ffaa00",
             driveLink: "https://drive.google.com/drive/folders/15ZTMeERrgk9kdnYC0x-bbzNAxD6fzhNk"
         },
         "superfixlag": {
@@ -38,6 +38,16 @@ const CONFIG = {
             status: "Đang cập nhật",
             statusColor: "#ffaa00",            
             driveLink: ""
-        }
+        }, 
+        "dv v15": {
+            title: "Định Vị V15 Free Fire Ob54",
+            date: "01/08/2026",
+            status: "Hoạt Động",  
+            statusColor: "#00ff88",
+            drivelink: ""
+
+            
+    
+            
     }
 };
